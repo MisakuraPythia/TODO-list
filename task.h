@@ -5,6 +5,7 @@
 #ifndef TODO_TASK_H
 #define TODO_TASK_H
 #include <string>
+#include <vector>
 
 
 struct Task {

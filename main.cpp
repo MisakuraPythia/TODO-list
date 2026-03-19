@@ -1,13 +1,24 @@
+#include <fstream>
 #include <iostream>
 #include <vector>
 #include "task.h"
 #include <limits>
 
-void printPriority(int priority) {
-    for (int i = 0; i < tasks.size(); i++) {
-        if (tasks[i].priority == priority) {
-            std::cout << tasks[i].name << ": ";
-            if (tasks[i].finished) {
+void saveTasks() {
+    std::ofstream file("tasks.txt");
+
+    for (Task& task : tasks) {
+        file << task.name << "|" << task.priority << "|" << task.finished << '\n';
+    }
+    file.close();
+}
+
+
+void printPriority(const int priority, std::vector<Task> &taskByPriority) {
+    for (const Task& task : tasks) {
+        if (task.priority == priority) {
+            std::cout << task.name << ": ";
+            if (task.finished) {
                 std::cout << "COMPLETE\n";
             }
             else {
@@ -18,15 +29,6 @@ void printPriority(int priority) {
 }
 
 
-void printTasks() {
-    std::cout << "\n---My Tasks List---\n";
-    std::cout << "   -Priority 1 tasks-  \n";
-    printPriority(1);
-    std::cout << "   -Priority 2 tasks-  \n";
-    printPriority(2);
-    std::cout << "   -Priority 3 tasks-  \n";
-    printPriority(3);
-}
 
 
 Task addTask() {
@@ -53,6 +55,8 @@ int main()
         std::cout << "2. Add to List\n";
         std::cout << "3. Quit\n";
 
+        std::cin >> choice;
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         while (choice < 1 || choice > 3)
         {
             std::cin >> choice;
@@ -60,7 +64,17 @@ int main()
 
         if (choice == 1)
         {
-            printTasks();
+
+            std::cout << "\n---My Tasks List---\n";
+            std::cout << "\n   -Priority 1 tasks-  \n";
+            std::vector<Task> priority1{};
+            printPriority(1, priority1);
+            std::cout << "\n   -Priority 2 tasks-  \n";
+            std::vector<Task> priority2{};
+            printPriority(2, priority2);
+            std::cout << "\n   -Priority 3 tasks-  \n";
+            std::vector<Task> priority3{};
+            printPriority(3, priority3);
             std::cout << "Press Enter to continue...";
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // clear buffer
             std::cin.get(); // wait for Enter
@@ -73,8 +87,6 @@ int main()
                 std::cout << "Task has been created!\n";
                 std::cout << "Would you like to create another? (y/n)\n";
 
-
-
                 while (true){
                     char selection{};
                     std::cin >> selection;
@@ -85,18 +97,13 @@ int main()
                     if (selection == 'n') {
                         want = false;
                         break;
-
                     }
                     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
                 }
-
-
             }
         }
-    choice = 0;
     }
-
-
+    saveTasks();
     return 0;
 }
 
