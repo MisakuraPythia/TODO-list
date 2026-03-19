@@ -5,6 +5,51 @@
 #include <limits>
 #include <typeinfo>
 #include <sstream>
+#include <iomanip>
+#include <chrono>
+
+int getCurrentDate() {
+    auto now = std::chrono::system_clock::now();
+    std::time_t now_c = std::chrono::system_clock::to_time_t(now);
+    std::tm localTime = *std::localtime(&now_c);
+
+    int year = localTime.tm_year + 1900;   // tm_year is years since 1900
+    int month = localTime.tm_mon + 1;      // tm_mon is 0–11
+    int day = localTime.tm_mday;           // day of the month 1–31
+
+    return year * 10000 + month * 100 + day;  // YYYYMMDD
+}
+
+
+// function checks to see if day has passed, then updates the daily tasks to incomplete
+void newDay() {
+    std::ifstream file("day.txt");
+    std::string oldTime{};
+    int currentDate{getCurrentDate()};
+    bool newDay = false;
+    if (file.is_open()) {
+        std::getline(file, oldTime);
+        int oldTimeNum = std::stoi(oldTime);
+        if (oldTimeNum == currentDate) {
+            newDay = true;
+        }
+    }
+    file.close();
+
+    if (newDay) {
+        std::ofstream outputToFile("day.txt");
+        if (outputToFile.is_open()) {
+            outputToFile << currentDate;
+            for (Task& task : tasks) {
+                if (task.priority == 1) {
+                    task.finished = false;
+                }
+            }
+        }
+        outputToFile.close();
+    }
+
+}
 
 void saveTasks() {
     std::ofstream file("tasks.txt");
@@ -37,10 +82,10 @@ void loadTasks() {
     }
 }
 
-void printPriority(const int priority) {
+void printPriority(const int& priority, const int& length) {
     for (const Task& task : tasks) {
         if (task.priority == priority) {
-            std::cout << task.name << ": ";
+            std::cout << std::left << std::setw(length + 2) << task.name << ": ";
             if (task.finished) {
                 std::cout << "COMPLETE\n";
             }
@@ -56,7 +101,7 @@ Task addTask() {
     std::cout << "What is your task\n";
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     std::getline(std::cin, create.name);
-    std::cout << "And the priority? (choose a number between 1 and 3, with 3 being the lowest\n";
+    std::cout << "And the priority? (1. Daily, 2. Asap, 3. Long-term)\n";
     while (typeid(create.priority) != typeid(int) || (create.priority < 1 || create.priority > 3))
     {
         std::cin >> create.priority;
@@ -65,10 +110,20 @@ Task addTask() {
     return create;
 }
 
+int getLongestTask() {
+    int length{};
+    for (Task& task : tasks) {
+        if (task.name.size() > length) {
+            length = static_cast<int>(task.name.size());
+        }
+    }
+    return length;
+}
 
 int main()
 {
     loadTasks();
+    newDay();
     int choice{};
     while (choice != 3) {
         std::cout << "\n---My TODO list---\n";
@@ -86,14 +141,18 @@ int main()
         if (choice == 1)
         {
             int listChoice{};
+            int length = getLongestTask();
+            std::string priorityOneTitle{"-Daily tasks-"};
+            std::string priorityTwoTitle{"-Asap tasks-"};
+            std::string priorityThreeTitle{"-Long term tasks-"};
             while (listChoice != 4) {
                 std::cout << "\n---My Tasks List---\n";
-                std::cout << "\n   -Priority 1 tasks-  \n";
-                printPriority(1);
-                std::cout << "\n   -Priority 2 tasks-  \n";
-                printPriority(2);
-                std::cout << "\n   -Priority 3 tasks-  \n";
-                printPriority(3);
+                std::cout << '\n' << priorityOneTitle << '\n';
+                printPriority(1, length);
+                std::cout << '\n' << priorityTwoTitle << '\n';
+                printPriority(2, length);
+                std::cout << '\n' << priorityThreeTitle << '\n';
+                printPriority(3, length);
 
                 std::cout << "\n\n1. Mark a task as complete/incomplete\n2. Remove a task\n3. Remove all completed (not daily)\n4. Exit\n";
 
