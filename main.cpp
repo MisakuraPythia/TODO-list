@@ -23,21 +23,21 @@ int getCurrentDate() {
 
 // function checks to see if day has passed, then updates the daily tasks to incomplete
 void newDay() {
-    std::ifstream file("day.txt");
+    std::ifstream file(std::string(getenv("HOME")) + "/.todo_day.txt");
     std::string oldTime{};
     int currentDate{getCurrentDate()};
-    bool newDay = false;
+    bool isNewDay = false;
     if (file.is_open()) {
         std::getline(file, oldTime);
         int oldTimeNum = std::stoi(oldTime);
-        if (oldTimeNum == currentDate) {
-            newDay = true;
+        if (oldTimeNum != currentDate) {
+            isNewDay = true;
         }
     }
     file.close();
 
-    if (newDay) {
-        std::ofstream outputToFile("day.txt");
+    if (isNewDay) {
+        std::ofstream outputToFile(std::string(getenv("HOME")) + "/.todo_day.txt");
         if (outputToFile.is_open()) {
             outputToFile << currentDate;
             for (Task& task : tasks) {
@@ -52,7 +52,7 @@ void newDay() {
 }
 
 void saveTasks() {
-    std::ofstream file("tasks.txt");
+    std::ofstream file(std::string(getenv("HOME")) + "/.todo_tasks.txt");
 
     for (Task& task : tasks) {
         file << task.name << "|" << task.priority << "|" << task.finished << '\n';
@@ -65,7 +65,7 @@ Task addTaskLoad(Task& create) {
 }
 
 void loadTasks() {
-    std::ifstream file("tasks.txt");
+    std::ifstream file(std::string(getenv("HOME")) + "/.todo_tasks.txt");
 
     if (file.is_open()) {
         std::string line{};
@@ -126,6 +126,7 @@ int main(int argc, char* argv[]){
 
         if (argc > 4) {
             std::cout << "Too many commands";
+            return 0;
         }
         if (command == "add") {
             if (argc < 4) {
@@ -242,12 +243,6 @@ int main(int argc, char* argv[]){
             return 0;
         }
     }
-
-
-
-
-
-
 
 
 
