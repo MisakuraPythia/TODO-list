@@ -86,7 +86,7 @@ int main()
         if (choice == 1)
         {
             int listChoice{};
-            while (listChoice != 3) {
+            while (listChoice != 4) {
                 std::cout << "\n---My Tasks List---\n";
                 std::cout << "\n   -Priority 1 tasks-  \n";
                 printPriority(1);
@@ -139,7 +139,32 @@ int main()
                     }
 
                 }
+
                 if (listChoice == 3) {
+                    char remove{};
+                    std::cout << "Are you sure you would like to remove all finished tasks? (y/n)";
+                    while (remove != 'y' && remove != 'n') {
+                        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                        std::cin >> remove;
+                        if (remove == 'y') {
+                            std::vector<int> finishedTasks;
+                            for (int i = 0; i < tasks.size(); i++) {
+                                if (tasks[i].finished == true && tasks[i].priority != 1) {
+                                    finishedTasks.push_back(i);
+                                }
+                            }
+                            for (int i = 0; i < finishedTasks.size(); i++) {
+                                tasks.erase(tasks.begin () + finishedTasks[i] - i);
+                            }
+                            break;
+                        }
+                        if (remove == 'n') {
+                            break;
+                        }
+                    }
+
+                }
+                if (listChoice == 4) {
                     break;
                 }
             }
