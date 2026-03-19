@@ -95,7 +95,7 @@ int main()
                 std::cout << "\n   -Priority 3 tasks-  \n";
                 printPriority(3);
 
-                std::cout << "\n\n1. Mark a task as complete/incomplete\n2. Remove a task\n3. Exit\n";
+                std::cout << "\n\n1. Mark a task as complete/incomplete\n2. Remove a task\n3. Remove all completed (not daily)\n4. Exit\n";
 
                 std::cin >> listChoice;
                 if (listChoice == 1) {
