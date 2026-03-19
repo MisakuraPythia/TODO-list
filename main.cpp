@@ -19,7 +19,6 @@ Task addTaskLoad(Task& create) {
     return create;
 }
 
-
 void loadTasks() {
     std::ifstream file("tasks.txt");
 
@@ -38,8 +37,7 @@ void loadTasks() {
     }
 }
 
-
-void printPriority(const int priority, std::vector<Task> &taskByPriority) {
+void printPriority(const int priority) {
     for (const Task& task : tasks) {
         if (task.priority == priority) {
             std::cout << task.name << ": ";
@@ -52,8 +50,6 @@ void printPriority(const int priority, std::vector<Task> &taskByPriority) {
         }
     }
 }
-
-
 
 Task addTask() {
     Task create{};
@@ -89,20 +85,64 @@ int main()
 
         if (choice == 1)
         {
+            int listChoice{};
+            while (listChoice != 3) {
+                std::cout << "\n---My Tasks List---\n";
+                std::cout << "\n   -Priority 1 tasks-  \n";
+                printPriority(1);
+                std::cout << "\n   -Priority 2 tasks-  \n";
+                printPriority(2);
+                std::cout << "\n   -Priority 3 tasks-  \n";
+                printPriority(3);
 
-            std::cout << "\n---My Tasks List---\n";
-            std::cout << "\n   -Priority 1 tasks-  \n";
-            std::vector<Task> priority1{};
-            printPriority(1, priority1);
-            std::cout << "\n   -Priority 2 tasks-  \n";
-            std::vector<Task> priority2{};
-            printPriority(2, priority2);
-            std::cout << "\n   -Priority 3 tasks-  \n";
-            std::vector<Task> priority3{};
-            printPriority(3, priority3);
-            std::cout << "Press Enter to continue...";
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // clear buffer
-            std::cin.get(); // wait for Enter
+                std::cout << "\n\n1. Mark a task as complete/incomplete\n2. Remove a task\n3. Exit\n";
+
+                std::cin >> listChoice;
+                if (listChoice == 1) {
+                    std::string taskName{};
+                    std::cout << "\nWhat is the name of the task you would like to mark as complete/incomplete?\n";
+                    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                    std::getline(std::cin, taskName);
+                    bool found{false};
+                    for (Task& task : tasks) {
+                        if (task.name == taskName) {
+                            task.finished = !task.finished;
+                            std::cout << task.name << " status successfully updated!\n";
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) {
+                        std::cout <<"No task with the name of '" << taskName << "'\n";
+                    }
+                }
+                if (listChoice == 2) {
+                    std::string taskName{};
+                    std::cout << "\nWhat is the name of the task you would like to remove?\n";
+                    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                    std::getline(std::cin, taskName);
+                    bool found{false};
+                    int taskDeletion{};
+                    for (int i = 0; i < tasks.size(); i++) {
+                        if (tasks[i].name == taskName) {
+                            found = true;
+                            taskDeletion = i;
+                            break;
+                        }
+                    }
+                    if (found) {
+                        tasks.erase(tasks.begin () + taskDeletion);
+                        std::cout << taskName << " successfully removed!\n";
+                    }
+                    if (!found) {
+                        std::cout <<"No task with the name of '" << taskName << "'\n";
+                    }
+
+                }
+                if (listChoice == 3) {
+                    break;
+                }
+            }
         }
 
         if (choice == 2) {
@@ -110,6 +150,7 @@ int main()
             while (want) {
                 tasks.push_back(addTask());
                 std::cout << "Task has been created!\n";
+                saveTasks();
                 std::cout << "Would you like to create another? (y/n)\n";
 
                 while (true){
