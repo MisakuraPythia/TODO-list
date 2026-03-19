@@ -120,8 +120,137 @@ int getLongestTask() {
     return length;
 }
 
-int main()
-{
+int main(int argc, char* argv[]){
+    if (argc > 1) {
+        std::string command = argv[1];
+
+        if (argc > 4) {
+            std::cout << "Too many commands";
+        }
+        if (command == "add") {
+            if (argc < 4) {
+                std::cout << "add command requires <priority> and <task_name>";
+            }
+            if (argc == 4) {
+                int argcPriority = std::stoi(argv[2]);
+                std::string taskName = argv[3];
+                if ((argcPriority >= 1 && argcPriority <= 3) && argc == 4 ) {
+                    loadTasks();
+                    newDay();
+                    Task create{};
+                    create.name = taskName;
+                    create.priority = argcPriority;
+                    tasks.push_back(create);
+                    saveTasks();
+                    return 0;
+                }
+            }
+            std::cout << "invalid commands";
+            return 0;
+        }
+        else if (command == "remove") {
+            if (argc == 3) {
+                std::string taskName{argv[2]};
+                loadTasks();
+                newDay();
+                int deletion{};
+                bool match{false};
+                for (int i = 0; i < tasks.size(); i++) {
+                    if (tasks[i].name == taskName) {
+                        deletion = i;
+                        match = true;
+                        break;
+
+                    }
+                }
+                if (match) {
+                    tasks.erase(tasks.begin() + deletion);
+                    saveTasks();
+                    return 0;
+                }
+                {
+                    std::cout << "No task with this name\n";
+                    return 0;
+                }
+            }
+            std::cout << "invalid";
+            return 0;
+        }
+        else if (command == "complete") {
+            if (argc == 3) {
+                std::string taskName{argv[2]};
+                loadTasks();
+                newDay();
+                bool match{false};
+                for (Task& task: tasks) {
+                    if (task.name == taskName) {
+                        match = true;
+                        task.finished = true;
+                        break;
+                    }
+                }
+                if (match){
+                    saveTasks();
+                }
+                else {
+                    std::cout << "No task with this name\n";
+                }
+                return 0;
+            }
+            std::cout << "invalid commands";
+            return 0;
+        }
+
+        else if (command == "incomplete") {
+            if (argc == 3) {
+                std::string taskName{argv[2]};
+                loadTasks();
+                newDay();
+                bool match{false};
+                for (Task& task: tasks) {
+                    if (task.name == taskName) {
+                        match = true;
+                        task.finished = false;
+                        break;
+                    }
+                }
+                if (match){
+                    saveTasks();
+                    return 0;
+                }
+                std::cout << "No task with this name\n";
+                return 0;
+            }
+            std::cout << "invalid commands";
+            return 0;
+        }
+
+        else if (command == "list") {
+            loadTasks();
+            newDay();
+            int length = getLongestTask();
+            std::string priorityOneTitle{"-Daily tasks-"};
+            std::string priorityTwoTitle{"-Asap tasks-"};
+            std::string priorityThreeTitle{"-Long term tasks-"};
+            std::cout << "\n---My Tasks List---\n";
+            std::cout << '\n' << priorityOneTitle << '\n';
+            printPriority(1, length);
+            std::cout << '\n' << priorityTwoTitle << '\n';
+            printPriority(2, length);
+            std::cout << '\n' << priorityThreeTitle << '\n';
+            printPriority(3, length);
+            return 0;
+        }
+    }
+
+
+
+
+
+
+
+
+
     loadTasks();
     newDay();
     int choice{};
