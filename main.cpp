@@ -3,6 +3,8 @@
 #include <vector>
 #include "task.h"
 #include <limits>
+#include <typeinfo>
+#include <sstream>
 
 void saveTasks() {
     std::ofstream file("tasks.txt");
@@ -11,6 +13,29 @@ void saveTasks() {
         file << task.name << "|" << task.priority << "|" << task.finished << '\n';
     }
     file.close();
+}
+
+Task addTaskLoad(Task& create) {
+    return create;
+}
+
+
+void loadTasks() {
+    std::ifstream file("tasks.txt");
+
+    if (file.is_open()) {
+        std::string line{};
+        while (getline(file, line)) {
+            std::stringstream ss{line};
+            Task load{};
+            getline(ss, load.name, '|');
+            ss >> load.priority;
+            ss.ignore(1);
+            ss >> load.finished;
+            tasks.push_back(addTaskLoad(load));
+        }
+        file.close();
+    }
 }
 
 
@@ -30,16 +55,16 @@ void printPriority(const int priority, std::vector<Task> &taskByPriority) {
 
 
 
-
 Task addTask() {
     Task create{};
     std::cout << "What is your task\n";
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     std::getline(std::cin, create.name);
     std::cout << "And the priority? (choose a number between 1 and 3, with 3 being the lowest\n";
-    while (create.priority < 1 || create.priority > 3)
+    while (typeid(create.priority) != typeid(int) || (create.priority < 1 || create.priority > 3))
     {
         std::cin >> create.priority;
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }
     return create;
 }
@@ -47,7 +72,7 @@ Task addTask() {
 
 int main()
 {
-
+    loadTasks();
     int choice{};
     while (choice != 3) {
         std::cout << "\n---My TODO list---\n";
